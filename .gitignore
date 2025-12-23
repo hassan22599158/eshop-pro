@@ -1,11 +1,2 @@
-__pycache__/
-*.pyc
-node_modules/
-.next/
-frontend/.next/
-frontend/node_modules/
-ecommerce.db
-.cache/
-.npm/
-.pip/
-frontend/public/
+.DS_Store
+Thumbs.db
