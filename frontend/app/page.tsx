@@ -17,26 +17,17 @@ import {
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-
-interface Product {
-  id: number
-  name: string
-  price: number
-  image_url: string
-  description: string
-  rating?: number
-  reviews?: number
-}
+import { StorageService, Product } from "@/lib/storage"
 
 export default function HomePage() {
   const [email, setEmail] = useState("")
   const [products, setProducts] = useState<Product[]>([])
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error("Failed to fetch products:", err))
+    // Initialize mock data
+    StorageService.initialize()
+    // Fetch products from local storage
+    setProducts(StorageService.getProducts())
   }, [])
 
   return (

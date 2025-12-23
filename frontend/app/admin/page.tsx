@@ -6,24 +6,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-
-interface Order {
-  id: number
-  user_id: number
-  total_price: number
-  status: string
-  created_at: string
-}
+import { StorageService, Order } from "@/lib/storage"
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [recentOrders, setRecentOrders] = useState<Order[]>([])
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/admin/orders")
-      .then((res) => res.json())
-      .then((data) => setRecentOrders(data))
-      .catch((err) => console.error("Failed to fetch orders:", err))
+    // Initialize mock data
+    StorageService.initialize()
+    setRecentOrders(StorageService.getOrders())
   }, [])
 
   const sidebarItems = [

@@ -50,38 +50,34 @@ export default function CartContent() {
     try {
         // Get user from localStorage
         const userStr = localStorage.getItem("user")
-        let userId = 1 // Fallback to admin if not logged in (for demo)
 
-        if (userStr) {
-            const user = JSON.parse(userStr)
-            if (user.user_id) userId = user.user_id
-        } else {
+        if (!userStr) {
              alert("Please login to checkout.")
              router.push("/auth")
              return
         }
 
-        const response = await fetch("http://localhost:8000/api/orders", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                user_id: userId,
-                items: cartItems.map(item => ({
-                    product_id: item.product_id,
-                    quantity: item.quantity
-                }))
-            })
-        })
+        const user = JSON.parse(userStr)
+        const userId = user.id
 
-        if (response.ok) {
+        // Use StorageService instead of API call
+        const { StorageService } = await import("@/lib/storage")
+
+        const success = StorageService.createOrder(
+            userId,
+            cartItems.map(item => ({
+                product_id: item.product_id,
+                quantity: item.quantity
+            }))
+        )
+
+        if (success) {
             alert("Order placed successfully!")
             setCartItems([])
             localStorage.removeItem("cart")
             router.push("/")
         } else {
-            alert("Failed to place order.")
+            alert("Failed to place order. Check stock availability.")
         }
     } catch (error) {
         console.error("Checkout error:", error)

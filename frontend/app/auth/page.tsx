@@ -20,28 +20,24 @@ export default function AuthPage() {
     e.preventDefault()
     setLoading(true)
 
-    const endpoint = isSignUp ? "http://localhost:8000/auth/register" : "http://localhost:8000/auth/login"
-    const body = isSignUp
-        ? { email, password, full_name: "New User" }
-        : { email, password }
-
     try {
-        const res = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        })
+        const { StorageService } = await import("@/lib/storage")
 
-        const data = await res.json()
-
-        if (!res.ok) {
-            alert(data.detail || "Authentication failed")
+        if (isSignUp) {
+            const result = StorageService.register(email, password, "New User")
+            if (typeof result === "string") {
+                alert(result) // Error message
+            } else {
+                alert("Account created! Please sign in.")
+                setIsSignUp(false)
+            }
         } else {
-            alert(isSignUp ? "Account created! Please sign in." : "Login successful!")
-            if (!isSignUp) {
-                // Save token or user info
-                localStorage.setItem("user", JSON.stringify(data))
-                // Redirect to home (we'd need useRouter here, but sticking to alert for now as per minimal changes)
+            const user = StorageService.login(email, password)
+            if (!user) {
+                alert("Invalid credentials")
+            } else {
+                alert("Login successful!")
+                localStorage.setItem("user", JSON.stringify(user))
                 window.location.href = "/"
             }
         }

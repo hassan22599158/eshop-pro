@@ -5,15 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-
-interface Product {
-    id: number
-    name: string
-    price: number
-    image_url: string
-    description: string
-    stock_quantity: number
-}
+import { StorageService, Product } from "@/lib/storage"
 
 export default function ProductDetails({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState(1)
@@ -23,13 +15,11 @@ export default function ProductDetails({ productId }: { productId: string }) {
   const router = useRouter()
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/products/${productId}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Product not found")
-        return res.json()
-      })
-      .then((data) => setProduct(data))
-      .catch((err) => console.error("Failed to fetch product:", err))
+    const id = parseInt(productId)
+    if (!isNaN(id)) {
+      const foundProduct = StorageService.getProduct(id)
+      setProduct(foundProduct || null)
+    }
   }, [productId])
 
   const addToCart = () => {
